@@ -83,7 +83,8 @@
             <ImageView fx:id="itemImage" fitHeight="358.0" fitWidth="268.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                <image>
                   <!--<Image url="@../../../../Pictures/Skärmklipp.PNG" />-->
-               </image></ImageView>
+               </image>
+            </ImageView>
             <Label text="Item description:" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" />
             <Label text="Bidding history:" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" />
             <Label alignment="CENTER" text="Highest bid:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP" />
