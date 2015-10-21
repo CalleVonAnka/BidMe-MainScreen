@@ -1,9 +1,6 @@
 package sample;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.firebase.client.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
@@ -45,17 +42,53 @@ public class Controller implements Initializable {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapchot : dataSnapshot.getChildren()){
-                    item = postSnapchot.getValue(HashMap.class);
-                    fireBaseItems.add((HashMap<String,Object>) item);
+                System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
 
-                    System.out.println(dataSnapshot.getValue());
+                    BidItem bidItem = postSnapshot.getValue(BidItem.class);
+                    System.out.println(bidItem.getTitle() + " - " + bidItem.getDescription());
+//bortkommenterat men ska användas, har problem med databasen att hämta bids/bidders eftersom BidItem klassen måste veta exakt vad värdena i firebase heter
+//                    item = postSnapshot.getValue(HashMap.class);
+//                    fireBaseItems.add((HashMap<String,Object>) item);
+//
+//                    System.out.println(fireBaseItems.get(0).get("Title").toString());
+//                    itemDescription.setText(fireBaseItems.get(0).get("Title").toString());
+
                 }
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("Firebase read failed: "+ firebaseError.getMessage());
+            }
+        });
 
+        myFirebase.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                BidItem newBid = dataSnapshot.getValue(BidItem.class);
+                System.out.println("New bid: " + newBid.getBids());
+                bidHistory.setText(newBid.getBids().toString());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("Firebase read failed: "+ firebaseError.getMessage());
             }
         });
 
