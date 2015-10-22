@@ -14,11 +14,17 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        /*creates the scene*/
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setScene(new Scene(root, 1024, 768));
         primaryStage.show();
     }
 
-
+    /*should stop all activity here, including connection*/
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        //Controller.onStop();
+    }
 
 }
