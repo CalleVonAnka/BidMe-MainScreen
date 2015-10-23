@@ -22,7 +22,7 @@ public class Controller implements Initializable {
     @FXML public ImageView itemImage;
 
 /*creates a connection to firebase calle myFirebase*/
-    private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com");
+    private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
 
     /*creates a list which holds the firebaseitems and a hashmap*/
     private List<HashMap<String,Object>> fireBaseItems = new ArrayList<HashMap<String, Object>>();
@@ -58,81 +58,21 @@ public class Controller implements Initializable {
 
         countdown.setText(cunter);
 
-        myFirebase.child("items/120cf67d-6677-49a9-8da8-1589a47ae3ee");
-
-        /*a event that listens for changes in values in the database*/
         myFirebase.addValueEventListener(new ValueEventListener() {
-/*uses on data change function*/
+            @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-/*prints out current count posts/tables in the database*/
-                System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
-/*a for loop iterating with how many items in it(db)*/
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-
-//                    BidItem bidItem = postSnapshot.getValue(BidItem.class);
-//                    System.out.println(bidItem.getTitle() + " - " + bidItem.getDescription());
-
-/*selects only a value which will be used*/
-                    System.out.println(postSnapshot.child("items/price").getKey());
-
-                    //works and will be used later on but working on isolating data and retrieving it right at the moment
-//                    item = postSnapshot.getValue(HashMap.class);
-//                    fireBaseItems.add((HashMap<String,Object>) item);
-//
-//                    System.out.println(fireBaseItems.get(0).get("Title").toString());
-//                    itemDescription.setText(fireBaseItems.get(0).get("Title").toString());
-
+                System.out.println("There are " + dataSnapshot.getChildrenCount() + " items in Firebase");
+                for (DataSnapshot postSnapShot : dataSnapshot.getChildren()) {
+                    Item auctionItem = postSnapShot.getValue(Item.class);
+                    System.out.println(auctionItem.getPrice());
                 }
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                //System.out.println("Firebase read failed: "+ firebaseError.getMessage());
+
             }
         });
-
-        /*myFirebase.child("Items").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                BidItem newBid = dataSnapshot.getValue(BidItem.class);
-                System.out.println("New bid: " + newBid.getBids());
-                bidHistory.setText(newBid.getBids().toString());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                //System.out.println("Firebase read failed: "+ firebaseError.getMessage());
-            }
-        });*/
-
     }
-
-    //körs i main för att rensa data
-    /*public void cleanup() {
-        // We're being destroyed, let go of our mListener and forget about all of the mModels
-        mRef.removeEventListener(mListener);
-        mModels.clear();
-        mKeys.clear();
-    }
-
-    public void onStop(){
-        myFirebase.getRoot().removeEventListener();
-        cleanup();
-    }*/
 
 }

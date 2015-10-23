@@ -6,25 +6,19 @@ import java.util.List;
 /**
  * Created by Calle Von Anka on 2015-10-21.
  */
-public class BidItem {
-
-    /*retrieves the items in database, for easier use in controller*/
-
-//    private List<HashMap<String,Object>> listBids;
+public class Item {
     private int currentprice;
     private String description;
-    private int price;
+    private String image;
+    private long price;
     private String seller;
     private boolean sold;
     private String title;
     private String type;
 
-    public BidItem() {
-    }
+    public Item() {
 
-    /*public List getBids() {
-        return listBids;
-    }*/
+    }
 
     public int getCurrentprice() {
         return currentprice;
@@ -34,7 +28,9 @@ public class BidItem {
         return description;
     }
 
-    public int getPrice() {
+    public String getImage() { return image; }
+
+    public long getPrice() {
         return price;
     }
 
