@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Controller implements Initializable {
 /*connects the ids from sample layout*/
@@ -35,17 +36,29 @@ public class Controller implements Initializable {
         /*using the ids to put in text*/
         //at the moment I'm using itemdescription for other stuff, that's why its commented away atm
         //itemDescription.setText("Seller: " + "GetSellerCalle \n" + "Description: \n" + "GetDescription \n" + "Start: " + "GetstartKR \n" + "Item: " + " GetItem");
+
         bidHistory.setText("GetBid\nArray/list");
         highestBid.setText("GetBidDesc");
+
         /*good way to generate a new image src and add it to imageview*/
         /*start*/
         File file = new File("src/img.jpg");
         Image newImage = new Image(file.toURI().toString());
         itemImage.setImage(newImage);
         /*end*/
-        countdown.setText("Time function goes here");
 
-        //myFirebase.child("items");
+        int min = 3;
+        int sec = 14;
+        double totalSec = TimeUnit.MINUTES.toSeconds(min) + sec;
+        String cunter = Double.toString(totalSec);
+
+        //Timer.countdownTimer();
+
+
+
+        countdown.setText(cunter);
+
+        myFirebase.child("items/120cf67d-6677-49a9-8da8-1589a47ae3ee");
 
         /*a event that listens for changes in values in the database*/
         myFirebase.addValueEventListener(new ValueEventListener() {
@@ -56,12 +69,11 @@ public class Controller implements Initializable {
 /*a for loop iterating with how many items in it(db)*/
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
 
-                    //BidItem bidItem = postSnapshot.getValue(BidItem.class);
-                    //System.out.println(bidItem.getTitle() + " - " + bidItem.getDescription());
+//                    BidItem bidItem = postSnapshot.getValue(BidItem.class);
+//                    System.out.println(bidItem.getTitle() + " - " + bidItem.getDescription());
 
 /*selects only a value which will be used*/
-                    System.out.println(postSnapshot.child("items/price").getValue());
-
+                    System.out.println(postSnapshot.child("items/price").getKey());
 
                     //works and will be used later on but working on isolating data and retrieving it right at the moment
 //                    item = postSnapshot.getValue(HashMap.class);

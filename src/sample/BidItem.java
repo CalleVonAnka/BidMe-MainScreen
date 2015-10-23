@@ -10,7 +10,7 @@ public class BidItem {
 
     /*retrieves the items in database, for easier use in controller*/
 
-    private List<HashMap<String,Object>> listBids;
+//    private List<HashMap<String,Object>> listBids;
     private int currentprice;
     private String description;
     private int price;
@@ -22,9 +22,9 @@ public class BidItem {
     public BidItem() {
     }
 
-    public List getBids() {
+    /*public List getBids() {
         return listBids;
-    }
+    }*/
 
     public int getCurrentprice() {
         return currentprice;
