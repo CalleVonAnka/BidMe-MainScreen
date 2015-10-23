@@ -7,31 +7,21 @@ import java.util.Scanner;
  */
 public class Timer  {
 
+    //en timer som räknar ner i konsolen från x sekunder, gjorde om den till int och returnerade men fick aldrig guin till att köras då
+    //har en annan timer från min förra commit som du kan testa med, dock så räknar den inte ner i guin. Ganska troligt att det är thread som skapar problem
 
-    public static void countdownTimer(){
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Timer started");
-        int time = scan.nextInt() * 60; // Convert to seconds
-        long delay = time * 1000;
-
-        do
-        {
-            int minutes = time / 60;
-            int seconds = time % 60;
-            System.out.println(minutes +" minute(s), " + seconds + " second(s)");
+    static Thread thread = new Thread();
+    public static void tjena(int x){
+        for (int i = x; i>=0; i--) {
             try {
-                Thread.sleep(1000);
+                thread.sleep(1000);
+                System.out.println(i);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            time = time - 1;
-            delay = delay - 1000;
 
         }
-        while (delay != 0);
-        System.out.println("Time's Up!");
     }
-
 
 }
 

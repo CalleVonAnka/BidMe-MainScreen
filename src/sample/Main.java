@@ -24,7 +24,8 @@ public class Main extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        //Controller.onStop();
+        //gör ett nytt objekt av onstop för att kunna stänga "main"-connection
+        new Controller().onStop();
     }
 
 }

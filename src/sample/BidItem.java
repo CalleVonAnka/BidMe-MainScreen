@@ -10,40 +10,51 @@ public class BidItem {
 
     /*retrieves the items in database, for easier use in controller*/
 
+    //den här klassen måste överenstämma med vad som finns som childs i items för att koden skall fungera korrekt
+
 //    private List<HashMap<String,Object>> listBids;
-    private int currentprice;
+    private int currentPrice;
     private String description;
-    private int price;
-    private String seller;
+    private String idBuyer;
+    private String idSeller;
+    private String image;
+    //private long price;
+    //private String seller;
     private boolean sold;
+    private int startedPrice;
     private String title;
     private String type;
+//    private int pincode;
 
     public BidItem() {
     }
 
-    /*public List getBids() {
-        return listBids;
-    }*/
-
-    public int getCurrentprice() {
-        return currentprice;
+    public int getCurrentPrice() {
+        return currentPrice;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public int getPrice() {
-        return price;
+    public String getIdBuyer() {
+        return idBuyer;
     }
 
-    public String getSeller() {
-        return seller;
+    public String getIdSeller() {
+        return idSeller;
+    }
+
+    public String getImage() {
+        return image;
     }
 
     public boolean isSold() {
         return sold;
+    }
+
+    public int getStartedPrice() {
+        return startedPrice;
     }
 
     public String getTitle() {
