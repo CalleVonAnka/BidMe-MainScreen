@@ -20,6 +20,8 @@ public class Controller implements Initializable {
     @FXML public TextArea bidHistory;
     @FXML public TextField highestBid;
     @FXML public ImageView itemImage;
+    private HashMap<String, Item> itemsMap = new HashMap<String, Item>();
+    private boolean itemsDownloaded = false;
 
 /*creates a connection to firebase calle myFirebase*/
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
@@ -47,25 +49,17 @@ public class Controller implements Initializable {
         itemImage.setImage(newImage);
         /*end*/
 
-        int min = 3;
-        int sec = 14;
-        double totalSec = TimeUnit.MINUTES.toSeconds(min) + sec;
-        String cunter = Double.toString(totalSec);
-
-        //Timer.countdownTimer();
-
-
-
-        countdown.setText(cunter);
-
         myFirebase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 System.out.println("There are " + dataSnapshot.getChildrenCount() + " items in Firebase");
                 for (DataSnapshot postSnapShot : dataSnapshot.getChildren()) {
                     Item auctionItem = postSnapShot.getValue(Item.class);
+                    itemsMap.put(auctionItem.getTitle(), auctionItem);
                     System.out.println(auctionItem.getPrice());
                 }
+
+                updateDescription("Livet Deluxe");
             }
 
             @Override
@@ -75,4 +69,7 @@ public class Controller implements Initializable {
         });
     }
 
+    public void updateDescription(String item) {
+        itemDescription.setText(itemsMap.get(item).getDescription());
+    }
 }
