@@ -25,3 +25,9 @@ public class Timer  {
 
 }
 
+
+
+/*ERROR MED UPPDATERING Push failed
+Failed with error: fatal: unable to access 'https://github.com/CalleVonAnka/BidMe-MainScreen.git/': Failed connect to github.com:443; No error
+Går inte att commita om, så skapar ändring i filen via denna kommentar, ta bort denna kommentar sen!
+*/
