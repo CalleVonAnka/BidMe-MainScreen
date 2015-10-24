@@ -1,5 +1,6 @@
 package sample;
 
+import com.firebase.client.Firebase;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,7 +28,4 @@ public class Main extends Application {
         //gör ett nytt objekt av onstop för att kunna stänga "main"-connection
         new Controller().onStop();
     }
-
 }
-
-//github problems with commit and push, no changes detected after i commited and pressed cancel to go back and change changes text. have to comment this to make changes and be able to reupload

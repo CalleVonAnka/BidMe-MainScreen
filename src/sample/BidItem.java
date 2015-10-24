@@ -8,23 +8,17 @@ import java.util.List;
  */
 public class BidItem {
 
-    /*retrieves the items in database, for easier use in controller*/
+    //Retrieves items from database, for easier use in controller
 
-    //den här klassen måste överenstämma med vad som finns som childs i items för att koden skall fungera korrekt
-
-//    private List<HashMap<String,Object>> listBids;
     private int currentPrice;
     private String description;
     private String idBuyer;
     private String idSeller;
     private String image;
-    //private long price;
-    //private String seller;
     private boolean sold;
     private int startedPrice;
     private String title;
     private String type;
-//    private int pincode;
 
     public BidItem() {
     }
@@ -65,5 +59,3 @@ public class BidItem {
         return type;
     }
 }
-
-//github problems with commit and push, no changes detected after i commited and pressed cancel to go back and change changes text. have to comment this to make changes and be able to reupload
