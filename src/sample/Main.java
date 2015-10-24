@@ -29,3 +29,5 @@ public class Main extends Application {
     }
 
 }
+
+//github problems with commit and push, no changes detected after i commited and pressed cancel to go back and change changes text. have to comment this to make changes and be able to reupload
