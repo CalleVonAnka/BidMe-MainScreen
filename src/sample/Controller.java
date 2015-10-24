@@ -7,7 +7,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import sun.invoke.empty.Empty;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 import java.text.Bidi;
@@ -22,8 +25,6 @@ public class Controller implements Initializable {
     @FXML public TextField highestBid;
     @FXML public ImageView itemImage;
 
-
-
 /*creates a connection to firebase calle myFirebase*/
     //använder mappen items, ska gå att koda som child men fungerade inte - men när det skrevs här fungerade det
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
@@ -32,17 +33,12 @@ public class Controller implements Initializable {
     private List<HashMap<String,Object>> fireBaseItems = new ArrayList<HashMap<String, Object>>();
     private HashMap<String, BidItem> itemsMap = new HashMap<String, BidItem>();
     private boolean itemsDownloaded = false;
+    private ArrayList<String> allBids = new ArrayList();
 
     /*reads when the program starts*/
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Initialize data...");
-
-        /*using the ids to put in text*/
-        itemDescription.setText("Seller: " + "GetSellerCalle \n" + "Description: \n" + "GetDescription \n" + "Start: " + "GetstartKR \n" + "Item: " + " GetItem");
-
-        bidHistory.setText("GetBid\nArray/list");
-        highestBid.setText("GetBidDesc");
 
         /*good way to generate a new image src and add it to imageview*/
         /*start*/
@@ -97,6 +93,8 @@ public class Controller implements Initializable {
                     itemsMap.put(bidItem.getTitle(), bidItem);
 
 
+
+
                 }
 
                 updateDescription("Snabb");//sträng med namnet på title i firebase för att starta metoden och
@@ -137,17 +135,51 @@ public class Controller implements Initializable {
                 //System.out.println("Firebase read failed: "+ firebaseError.getMessage());
             }
         });*/
-
-        countdown.setText("Time left: "  + "seconds" );
-        Timer.tjena(10);//kallar på timer funktionen, men guin öppnas inte förrän den räknat klart.. vilket är konstigt
     }
 
     public void updateDescription(String item) {
-        //Hämtar detta ifrån givet item och returnerar
-        System.out.println(itemsMap.get(item).getIdSeller());
-        System.out.println(itemsMap.get(item).getDescription());
-        System.out.println(itemsMap.get(item).getStartedPrice());
-        System.out.println(itemsMap.get(item).getType());
+
+        //Set information to variable
+        String description = itemsMap.get(item).getDescription();
+        String type = itemsMap.get(item).getType();
+        String title = itemsMap.get(item).getTitle();
+
+        //If item is sold
+        String sold;
+        Boolean isSold = itemsMap.get(item).isSold();
+        if(isSold){
+            sold = "Yes";
+        }else{
+            sold = "No";
+        }
+
+        Integer startPrice = itemsMap.get(item).getStartedPrice();
+        Integer currPrice = itemsMap.get(item).getCurrentPrice();
+        String itemN = itemsMap.get(item).getType();
+
+        /*Information to TextBox*/
+        itemDescription.setText(
+                "Type: " + type + "\n" +
+                "Title: " + title + "\n" +
+                "Description: \n" + description + "\n" +
+                "Start price: " + startPrice + "\n" +
+                "Item: " + itemN + "\n" +
+                "Item sold: " + sold);
+
+        //Add all bids to array
+        allBids.add(""+currPrice+"\n");
+        //Reverse order of bids
+        Collections.reverse(allBids);
+
+        //Information to TextBox / TextView
+        bidHistory.setText("" + allBids + "\n");
+        highestBid.setText(""+currPrice+"");
+
+        //Countdown (Timer does not work in string)
+        countdown.setText("Time left: " + Timer.time + " seconds" );
+
+        //Timer.tjena(10);//kallar på timer funktionen, men guin öppnas inte förrän den räknat klart.. vilket är konstigt
+
     }
 
     //försöker att stänga connection (skapas flera mains just nu) och kanske rensa guin för nästa item
