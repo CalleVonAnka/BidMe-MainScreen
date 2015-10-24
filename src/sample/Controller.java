@@ -3,19 +3,24 @@ package sample;
 import com.firebase.client.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import sun.invoke.empty.Empty;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 import java.text.Bidi;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 public class Controller implements Initializable {
 /*connects the ids from sample layout*/
@@ -48,32 +53,6 @@ public class Controller implements Initializable {
         /*end*/
 
 
-        //ett tappert försök på en enkel timer funktion som hade varit grymt ifall den fungerade!!
-        /*int min = 3;
-        int sec = 14;
-        double totalSec = TimeUnit.MINUTES.toSeconds(min) + sec;
-        String cunter = Double.toString(totalSec);*/
-
-        //en annan timer funktion
-       /* long startTime = System.currentTimeMillis();
-
-        //long elapsedTime = System.nanoTime() - startTime;
-        long elapsedTime = System.nanoTime() - startTime;
-        long timeTillNextDisplayChange = 1000 - (elapsedTime % 1000);
-        try {
-            Thread.sleep(timeTillNextDisplayChange);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        long elapsedSeconds = elapsedTime / 1000;
-        long secondsDisplay = elapsedSeconds % 60;
-        long elapsedMinutes = elapsedSeconds / 60;
-
-        String min = String.valueOf(elapsedMinutes);
-        String sec = String.valueOf(secondsDisplay);
-*/
-
-
         /*a event that listens for changes in values in the database*/
         myFirebase.addValueEventListener(new ValueEventListener() {
             /*uses on data change function*/
@@ -81,7 +60,7 @@ public class Controller implements Initializable {
                 /*prints out current count posts/tables in the database*/
                 System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
                 /*a for loop iterating with how many items in it(db)*/
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
                     //firebase exempel som klyddar men ska vara korrekt
 //                    BidItem bidItem = postSnapshot.getValue(BidItem.class);
@@ -93,8 +72,6 @@ public class Controller implements Initializable {
                     itemsMap.put(bidItem.getTitle(), bidItem);
 
 
-
-
                 }
 
                 updateDescription("Snabb");//sträng med namnet på title i firebase för att starta metoden och
@@ -102,7 +79,7 @@ public class Controller implements Initializable {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("Firebase read failed: "+ firebaseError.getMessage());
+                System.out.println("Firebase read failed: " + firebaseError.getMessage());
             }
         });
 
@@ -175,16 +152,23 @@ public class Controller implements Initializable {
         bidHistory.setText("" + allBids + "\n");
         highestBid.setText(""+currPrice+"");
 
-        //Countdown (Timer does not work in string)
-        countdown.setText("Time left: " + Timer.time + " seconds" );
+        /*Timer som räknar ner i sekunder*/
+        int seconds = 60;
 
-        //Timer.tjena(10);//kallar på timer funktionen, men guin öppnas inte förrän den räknat klart.. vilket är konstigt
+        for (int i = seconds; i>=0; i--) {
+            try {
+                sleep(1000);
+                countdown.setText("Time left: " + i + " seconds");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
 
     }
 
     //försöker att stänga connection (skapas flera mains just nu) och kanske rensa guin för nästa item
     public void cleanup() {
-        // We're being destroyed, let go of our mListener and forget about all of the mModels
         //myFirebase.removeEventListener();
 //        mModels.clear();
 //        mKeys.clear();
@@ -199,9 +183,3 @@ public class Controller implements Initializable {
 
 
 }
-
-
-/*ERROR MED UPPDATERING Push failed
-Failed with error: fatal: unable to access 'https://github.com/CalleVonAnka/BidMe-MainScreen.git/': Failed connect to github.com:443; No error
-Går inte att commita om, så skapar ändring i filen via denna kommentar, ta bort denna kommentar sen!
-*/
