@@ -1,5 +1,6 @@
 package sample;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class BidItem {
 
     private int currentPrice;
     private String description;
+    private String id;
     private String idBuyer;
     private String idSeller;
     private String image;
@@ -29,6 +31,10 @@ public class BidItem {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getIdBuyer() {
@@ -58,4 +64,5 @@ public class BidItem {
     public String getType() {
         return type;
     }
+
 }
