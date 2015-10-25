@@ -19,6 +19,7 @@ public class BidItem {
     private String image;
     private boolean sold;
     private int startedPrice;
+    private int timer;
     private String title;
     private String type;
 
@@ -57,6 +58,10 @@ public class BidItem {
         return startedPrice;
     }
 
+    public int getTimer() {
+        return timer;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -64,5 +69,4 @@ public class BidItem {
     public String getType() {
         return type;
     }
-
 }

@@ -65,6 +65,7 @@ public class Controller implements Initializable {
                     System.out.println(titleName);
                     updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
                 }
+                timerSeconds();
             }
 
             @Override
@@ -114,6 +115,10 @@ public class Controller implements Initializable {
         bidHistory.setText("" + allBids + "\n");
         highestBid.setText(""+currPrice+"");
 
+//        timerSeconds();
+    }
+
+    public void timerSeconds(){
         /*Timer som räknar ner i sekunder*/
         int seconds = 60;
 
