@@ -8,8 +8,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import sun.misc.BASE64Decoder;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -45,9 +48,6 @@ public class Controller implements Initializable {
         System.out.println("Initialize data...");
         goOnline();
 
-        File file = new File("src/img.jpg");
-        Image newImage = new Image(file.toURI().toString());
-        itemImage.setImage(newImage);
 
         //Event that listens for changes in the database
         myFirebase.addValueEventListener(new ValueEventListener() {
@@ -80,6 +80,17 @@ public class Controller implements Initializable {
     }
 
     public void updateDescription(String item) {
+        /*Decodes the image string and sets it as new variable for imageview*/
+        String imageString = itemsMap.get(item).getImage();
+        BASE64Decoder base64Decoder = new BASE64Decoder();
+        try {
+            ByteArrayInputStream decodedImage = new ByteArrayInputStream(base64Decoder.decodeBuffer(imageString));
+            Image newImage = new Image(decodedImage);
+            itemImage.setImage(newImage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         //Set information to variable
         String description = itemsMap.get(item).getDescription();
@@ -119,7 +130,7 @@ public class Controller implements Initializable {
         bidHistory.setText("" + allBids + "\n");
         highestBid.setText(""+currPrice+"");
 
-        int seconds = 6;
+        int seconds = 60;
 
         for (int i = seconds; i>=0; i--) {
             try {
@@ -137,10 +148,6 @@ public class Controller implements Initializable {
         }
     }
 
-    public void timerSeconds(){
-        /*Timer som räknar ner i sekunder*/
-
-    }
 
     public void goOnline() {
         myFirebase.goOnline();
