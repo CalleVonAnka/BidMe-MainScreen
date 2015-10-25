@@ -6,8 +6,10 @@ import javafx.fxml.Initializable;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -38,6 +40,11 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Initialize data...");
+        goOnline();
+
+        File file = new File("src/img.jpg");
+        Image newImage = new Image(file.toURI().toString());
+        itemImage.setImage(newImage);
 
         //Event that listens for changes in the database
         myFirebase.addValueEventListener(new ValueEventListener() {
@@ -52,8 +59,12 @@ public class Controller implements Initializable {
                     Hämtar title och lägger i itemsMap*/
                     BidItem bidItem = postSnapshot.getValue(BidItem.class);
                     itemsMap.put(bidItem.getTitle(), bidItem);
+
+
+                    String titleName = bidItem.getTitle().toString();
+                    System.out.println(titleName);
+                    updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
                 }
-                updateDescription("Snabb");//sträng med namnet på title i firebase för att starta metoden och
             }
 
             @Override
@@ -99,6 +110,7 @@ public class Controller implements Initializable {
         Collections.reverse(allBids);
 
         //Information to TextBox / TextView
+        //doesn't update with db at the moment, fix
         bidHistory.setText("" + allBids + "\n");
         highestBid.setText(""+currPrice+"");
 
@@ -109,25 +121,18 @@ public class Controller implements Initializable {
             try {
                 sleep(1000);
                 countdown.setText("Time left: " + i + " seconds");
-                //myFirebase.child(sellerID).child("timer").setValue(i);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    //försöker att stänga connection (skapas flera mains just nu) och kanske rensa guin för nästa item
-    public void cleanup() {
-        /*myFirebase.removeEventListener();
-        mModels.clear();
-        mKeys.clear();*/
+    public void goOnline() {
+        myFirebase.goOnline();
     }
 
-    //körs i main för att terminata connection o eventlistener som just nu inte har något namn och kan därför inte kalla listenern
     public void onStop(){
-        /*myFirebase.getRoot().removeEventListener();
-        Firebase.goOffline();
-        cleanup();*/
+        myFirebase.goOffline();
     }
 }
 
@@ -162,12 +167,6 @@ public class Controller implements Initializable {
             }
         });*/
 
-/*good way to generate a new image src and add it to imageview*/
-        /*start
-File file = new File("src/img.jpg");
-Image newImage = new Image(file.toURI().toString());
-itemImage.setImage(newImage);
-        end*/
 
 //firebase exempel som klyddar men ska vara korrekt
 //                    BidItem bidItem = postSnapshot.getValue(BidItem.class);
