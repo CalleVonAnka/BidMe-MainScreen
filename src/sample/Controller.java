@@ -36,6 +36,9 @@ public class Controller implements Initializable {
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
 
+    String buyerId;
+    String itemId;
+
     //Initialize the program
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -65,7 +68,7 @@ public class Controller implements Initializable {
                     System.out.println(titleName);
                     updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
                 }
-                timerSeconds();
+                //timerSeconds();
             }
 
             @Override
@@ -82,7 +85,8 @@ public class Controller implements Initializable {
         String description = itemsMap.get(item).getDescription();
         String type = itemsMap.get(item).getType();
         String title = itemsMap.get(item).getTitle();
-
+        itemId = itemsMap.get(item).getId();
+        buyerId = itemsMap.get(item).getIdBuyer();
         //If item is sold
         String sold;
         Boolean isSold = itemsMap.get(item).isSold();
@@ -94,7 +98,7 @@ public class Controller implements Initializable {
 
         Integer startPrice = itemsMap.get(item).getStartedPrice();
         Integer currPrice = itemsMap.get(item).getCurrentPrice();
-        String itemN = itemsMap.get(item).getType();
+
 
         /*Information to TextBox*/
         itemDescription.setText(
@@ -102,7 +106,7 @@ public class Controller implements Initializable {
                 "Title: " + title + "\n" +
                 "Description: \n" + description + "\n" +
                 "Start price: " + startPrice + "\n" +
-                "Item: " + itemN + "\n" +
+                "Item: " + type + "\n" +
                 "Item sold: " + sold);
 
         //Add all bids to array
@@ -115,21 +119,27 @@ public class Controller implements Initializable {
         bidHistory.setText("" + allBids + "\n");
         highestBid.setText(""+currPrice+"");
 
-//        timerSeconds();
-    }
-
-    public void timerSeconds(){
-        /*Timer som räknar ner i sekunder*/
-        int seconds = 60;
+        int seconds = 6;
 
         for (int i = seconds; i>=0; i--) {
             try {
                 sleep(1000);
                 countdown.setText("Time left: " + i + " seconds");
+                myFirebase.child(itemId).child("timer").setValue(i);
+
+                if(i == 0){
+                    myFirebase.child(itemId).child("sold").setValue(true);
+                    myFirebase.child(itemId).child("idBuyer").setValue("Petter");
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void timerSeconds(){
+        /*Timer som räknar ner i sekunder*/
+
     }
 
     public void goOnline() {
