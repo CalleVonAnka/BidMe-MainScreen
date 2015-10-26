@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import sun.misc.BASE64Decoder;
 
 import javax.xml.crypto.Data;
@@ -42,10 +43,16 @@ public class Controller implements Initializable {
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
 
-    String titleName;
-    String buyerId;
-    String itemId;
-    Boolean isSold;
+    private String titleName;
+    private String buyerId;
+    private String itemId;
+    private Boolean isSold;
+    private String imageString;
+    private String description;
+    private String type;
+    private String formattedBidArray;
+    private Integer currPrice;
+    private Integer startPrice;
 
     //Initialize the program
     @Override
@@ -56,7 +63,7 @@ public class Controller implements Initializable {
         //Event that listens for changes in the database
         myFirebase.addValueEventListener(new ValueEventListener() {
             public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
+                //System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
                     //kanske lägga in bidhistory som egen funtion här
@@ -85,7 +92,12 @@ public class Controller implements Initializable {
                 isSold = itemsMap.get(titleName).isSold();
                 if (!isSold) {
                     updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
+                    doInBackground(titleName);//det som ska köras vid sidan om
+                }else{
+                    ShowResults();
                 }
+
+                clearGUI();
 
             }
 
@@ -108,17 +120,23 @@ public class Controller implements Initializable {
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("Firebase read failed: " + firebaseError.getMessage());
             }
-            //... ChildEventListener also defines onChildChanged, onChildRemoved,
-            //    onChildMoved and onCanceled, covered in later sections.
         });
     }
 
+    private void ShowResults() {
+
+
+    }
+
+    private void clearGUI() {
+        bidHistory.clear();
+    }
 
 
     public void updateDescription(String item) {
 
         /*Decodes the image string and sets it as new variable for imageview*/
-        String imageString = itemsMap.get(item).getImage();
+        imageString = itemsMap.get(item).getImage();
         BASE64Decoder base64Decoder = new BASE64Decoder();
         try {
             ByteArrayInputStream decodedImage = new ByteArrayInputStream(base64Decoder.decodeBuffer(imageString));
@@ -129,14 +147,13 @@ public class Controller implements Initializable {
         }
 
         //Set information to variable
-        String description = itemsMap.get(item).getDescription();
-        String type = itemsMap.get(item).getType();
+        description = itemsMap.get(item).getDescription();
+        type = itemsMap.get(item).getType();
 
         itemId = itemsMap.get(item).getId();
         buyerId = itemsMap.get(item).getIdBuyer();
 
-        Integer startPrice = itemsMap.get(item).getStartedPrice();
-        Integer currPrice = itemsMap.get(item).getCurrentPrice();
+        startPrice = itemsMap.get(item).getStartedPrice();
 
 
         /*Information to TextBox*/
@@ -148,14 +165,28 @@ public class Controller implements Initializable {
                         "Item: " + type + "\n"
         );
 
+    }
+
+    public void doInBackground(String item){
+
+        currPrice = itemsMap.get(item).getCurrentPrice();
+
         //Add all bids to array
         allBids.add(""+currPrice+"\n");
         //Reverse order of bids
         Collections.reverse(allBids);
 
+
+
+        formattedBidArray = allBids.toString()
+                .replace(",", "")  //remove the commas
+                .replace("[", "")  //remove the left bracket
+                .replace("]", "")  //remove the right bracket
+                .trim();           //remove trailing spaces from partially initialized arrays
+
         //Information to TextBox / TextView
         //doesn't update with db at the moment, fix
-        bidHistory.setText("" + allBids + "\n");
+        bidHistory.setText("" + formattedBidArray + "\n");
         highestBid.setText(""+currPrice+"");
 
         int seconds = 20;
