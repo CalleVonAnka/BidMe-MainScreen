@@ -3,6 +3,7 @@ package sample;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Calle Von Anka on 2015-10-21.
@@ -11,6 +12,7 @@ public class BidItem {
 
     //Retrieves items from database, for easier use in controller
 
+//    private Map<String, Object> bids;
     private int currentPrice;
     private String description;
     private String id;
@@ -25,6 +27,10 @@ public class BidItem {
 
     public BidItem() {
     }
+
+    /*public Map<String, Object> getBids() {
+        return bids;
+    }*/
 
     public int getCurrentPrice() {
         return currentPrice;
@@ -69,4 +75,5 @@ public class BidItem {
     public String getType() {
         return type;
     }
+
 }

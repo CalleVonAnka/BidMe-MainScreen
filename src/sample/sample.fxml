@@ -15,7 +15,7 @@
             <Insets />
          </BorderPane.margin>
       </Pane>
-       <Button text="Click me to start" fx:id="button1"></Button>
+       <!--<Button text="Click me to start" fx:id="button1"></Button>-->
    </left>
    <!--Left block - STOP-->
 
