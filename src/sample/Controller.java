@@ -4,14 +4,15 @@ import com.firebase.client.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import sun.misc.BASE64Decoder;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -27,6 +28,8 @@ public class Controller implements Initializable {
     @FXML public TextArea bidHistory;
     @FXML public TextField highestBid;
     @FXML public ImageView itemImage;
+    @FXML public Button button1;
+
 
     //Creates a connection to firebase
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
@@ -39,15 +42,16 @@ public class Controller implements Initializable {
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
 
+    String titleName;
     String buyerId;
     String itemId;
+    Boolean isSold;
 
     //Initialize the program
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Initialize data...");
         goOnline();
-
 
         //Event that listens for changes in the database
         myFirebase.addValueEventListener(new ValueEventListener() {
@@ -64,11 +68,10 @@ public class Controller implements Initializable {
                     itemsMap.put(bidItem.getTitle(), bidItem);
 
 
-                    String titleName = bidItem.getTitle().toString();
+                    titleName = bidItem.getTitle().toString();
                     System.out.println(titleName);
                     updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
                 }
-                //timerSeconds();
             }
 
             @Override
@@ -76,7 +79,6 @@ public class Controller implements Initializable {
                 System.out.println("Firebase read failed: " + firebaseError.getMessage());
             }
         });
-
     }
 
     public void updateDescription(String item) {
@@ -95,12 +97,12 @@ public class Controller implements Initializable {
         //Set information to variable
         String description = itemsMap.get(item).getDescription();
         String type = itemsMap.get(item).getType();
-        String title = itemsMap.get(item).getTitle();
+
         itemId = itemsMap.get(item).getId();
         buyerId = itemsMap.get(item).getIdBuyer();
         //If item is sold
         String sold;
-        Boolean isSold = itemsMap.get(item).isSold();
+        isSold = itemsMap.get(item).isSold();
         if(isSold){
             sold = "Yes";
         }else{
@@ -114,7 +116,7 @@ public class Controller implements Initializable {
         /*Information to TextBox*/
         itemDescription.setText(
                 "Type: " + type + "\n" +
-                "Title: " + title + "\n" +
+                "Title: "+ titleName +"\n" +
                 "Description: \n" + description + "\n" +
                 "Start price: " + startPrice + "\n" +
                 "Item: " + type + "\n" +
@@ -130,7 +132,7 @@ public class Controller implements Initializable {
         bidHistory.setText("" + allBids + "\n");
         highestBid.setText(""+currPrice+"");
 
-        int seconds = 60;
+        int seconds = 6;
 
         for (int i = seconds; i>=0; i--) {
             try {
@@ -141,13 +143,13 @@ public class Controller implements Initializable {
                 if(i == 0){
                     myFirebase.child(itemId).child("sold").setValue(true);
                     myFirebase.child(itemId).child("idBuyer").setValue("Petter");
+
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
-
 
     public void goOnline() {
         myFirebase.goOnline();
@@ -157,39 +159,3 @@ public class Controller implements Initializable {
         myFirebase.goOffline();
     }
 }
-
-
-//bortkommenterat men kommer att användas ifall bidds ligger i items, just nu är inte strukturen korrekt i firebase
-        /*myFirebase.child("Items").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                BidItem newBid = dataSnapshot.getValue(BidItem.class);
-                System.out.println("New bid: " + newBid.getBids());
-                bidHistory.setText(newBid.getBids().toString());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                //System.out.println("Firebase read failed: "+ firebaseError.getMessage());
-            }
-        });*/
-
-
-//firebase exempel som klyddar men ska vara korrekt
-//                    BidItem bidItem = postSnapshot.getValue(BidItem.class);
-//                    System.out.println(bidItem.getTitle() + " - " + bidItem.getDescription());
