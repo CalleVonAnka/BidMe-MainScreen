@@ -20,6 +20,7 @@ public class BidItem {
     private String idSeller;
     private String image;
     private boolean sold;
+    private boolean upForSale;
     private int startedPrice;
     private int timer;
     private String title;
@@ -59,6 +60,8 @@ public class BidItem {
     public boolean isSold() {
         return sold;
     }
+
+    public boolean getUpForSale() { return upForSale; }
 
     public int getStartedPrice() {
         return startedPrice;

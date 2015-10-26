@@ -43,6 +43,9 @@ public class Controller implements Initializable {
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
 
+    private Timer timer;
+    private static int seconds;
+
     private String titleName;
     private String buyerId;
     private String itemId;
@@ -66,7 +69,7 @@ public class Controller implements Initializable {
                 //System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
-                    //kanske lägga in bidhistory som egen funtion här
+                    //kanske lï¿½gga in bidhistory som egen funtion hï¿½r
                 }
             }
 
@@ -82,7 +85,7 @@ public class Controller implements Initializable {
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
 
                 /*Selects only a value which will be used
-                    Hämtar title och lägger i itemsMap*/
+                    Hï¿½mtar title och lï¿½gger i itemsMap*/
                 BidItem bidItem = snapshot.getValue(BidItem.class);
                 itemsMap.put(bidItem.getTitle(), bidItem);
 
@@ -91,8 +94,8 @@ public class Controller implements Initializable {
                 System.out.println(titleName);
                 isSold = itemsMap.get(titleName).isSold();
                 if (!isSold) {
-                    updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
-                    doInBackground(titleName);//det som ska köras vid sidan om
+                    updateDescription(titleName);//strï¿½ng med namnet pï¿½ title i firebase fï¿½r att starta metoden och
+                    doInBackground(titleName);//det som ska kï¿½ras vid sidan om
                 }else{
                     ShowResults();
                 }
@@ -189,9 +192,22 @@ public class Controller implements Initializable {
         bidHistory.setText("" + formattedBidArray + "\n");
         highestBid.setText(""+currPrice+"");
 
-        int seconds = 20;
+        seconds = 20;
 
-        for (int i = seconds; i>=0; i--) {
+        timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                countdown.setText("" + setInterval());
+                myFirebase.child(itemId).child("timer").setValue(seconds);
+                if (seconds == 0) {
+                    myFirebase.child(itemId).child("sold").setValue(true);
+                }
+            }
+        }, 1000, 1000);
+
+        /*for (int i = seconds; i>=0; i--) {
             try {
                 sleep(1000);
                 countdown.setText("Time left: " + i + " seconds");
@@ -205,7 +221,14 @@ public class Controller implements Initializable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }*/
+    }
+
+    public static final int setInterval() {
+        if (seconds == 0) {
+            return seconds;
         }
+        return --seconds;
     }
 
 
