@@ -25,13 +25,10 @@ public class BidItem {
     private int timer;
     private String title;
     private String type;
+    private HashMap<String, Integer> bids;
 
     public BidItem() {
     }
-
-    /*public Map<String, Object> getBids() {
-        return bids;
-    }*/
 
     public int getCurrentPrice() {
         return currentPrice;
@@ -78,5 +75,7 @@ public class BidItem {
     public String getType() {
         return type;
     }
+
+    public HashMap<String, Integer> getBids() { return bids; }
 
 }
