@@ -8,38 +8,32 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import sun.misc.BASE64Decoder;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.text.Bidi;
 import java.util.*;
-import java.util.List;
 /**
  * Created by marioabouraad on 2015-10-27.
  */
 public class Auction implements Initializable {
 
+    private static int seconds;
     //connects the ids from GUI
     @FXML public TextField countdown;
     @FXML public TextArea itemDescription;
     @FXML public TextArea bidHistory;
     @FXML public TextField highestBid;
-    @FXML public ImageView itemImage;
 //    @FXML public Button button1;
-
-
+@FXML
+public ImageView itemImage;
     //Creates a connection to firebase
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
-
     //Creates a list which holds the firebaseitems and a hashmap
     private List<BidItem> fireBaseItems = new ArrayList<BidItem>();
     private HashMap<String, BidItem> itemsMap = new HashMap<String, BidItem>();
-
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
-
-    private static int seconds;
-
     private String titleName;
     private String buyerId;
     private String itemId;
@@ -127,7 +121,7 @@ public class Auction implements Initializable {
                             auctionId.child("id").setValue(itemId);
 
                             /**
-                             * Algorithm for myself for tomorrow.
+                             * Algorithm for myself.
                              *
                              * 1. In the auction-child, save the current id of the item displayed for sale now
                              * 2. Create a child in that id called bids.
@@ -225,10 +219,10 @@ public class Auction implements Initializable {
 
 
     public void goOnline() {
-        myFirebase.goOnline();
+        Firebase.goOnline();
     }
 
     public void onStop(){
-        myFirebase.goOffline();
+        Firebase.goOffline();
     }
 }
