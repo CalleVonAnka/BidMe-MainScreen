@@ -14,10 +14,10 @@ import java.net.URL;
 import java.text.Bidi;
 import java.util.*;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
-
-public class Controller implements Initializable {
+/**
+ * Created by marioabouraad on 2015-10-27.
+ */
+public class Auction implements Initializable {
 
     //connects the ids from GUI
     @FXML public TextField countdown;
@@ -49,16 +49,21 @@ public class Controller implements Initializable {
     private String type;
     private String formattedBidArray;
     private Integer currPrice;
+    private Integer highestPrice;
     private Integer startPrice;
 
     private HashMap<String, Object> hashMapItem;
 
-    //Initialize the program
+    private Firebase auctionId = new Firebase("https://biddme.firebaseio.com/auction");
+
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Initialize data...");
-        hashMapItem = new HashMap<String, Object>();
-                goOnline();
+        hashMapItem = new HashMap<>();
+        goOnline();
+
 
         //Event that listens for changes in the database
         myFirebase.addValueEventListener(new ValueEventListener() {
@@ -90,6 +95,7 @@ public class Controller implements Initializable {
 
 
 
+
                 /*titleName = bidItem.getTitle().toString();
                 System.out.println(titleName);
                 isSold = itemsMap.get(titleName).isSold();
@@ -117,7 +123,38 @@ public class Controller implements Initializable {
                         @Override
                         public void run() {
                             countdown.setText("Time left: " + --seconds);
+                            Firebase auctionId = new Firebase("https://biddme.firebaseio.com/auction");
+                            auctionId.child("id").setValue(itemId);
 
+                            /**
+                             * Algorithm for myself for tomorrow.
+                             *
+                             * 1. In the auction-child, save the current id of the item displayed for sale now
+                             * 2. Create a child in that id called bids.
+                             * 3. Make firebase store all the bids (and what user-id that bid came from)
+                             * 4. Sort the list of bids with highestvalue first
+                             * 5. Everytime a higherbid is made, add 5 more seconds
+                             * 6. When time is up, the user with highest bid wins.
+                             *
+                             * -----"Maybes"------
+                             *
+                             * - 30-60 second pause before next item shows up
+                             * - The auction child should empty its values after the auction ends?
+                             * - Make a firebase-child with "solditems"
+                             * - Move the soldItem from items to soldItems
+                             *
+                             * //Mario
+                             *
+                             *
+                             */
+
+
+                            currPrice = startPrice;
+
+                            if(highestPrice>currPrice) {
+                                currPrice = highestPrice;
+                                seconds+=5;
+                            }
 
                             if (seconds == 0) {
                                 myFirebase.child(bidItem.getId()).child("sold").setValue(true);
@@ -125,6 +162,7 @@ public class Controller implements Initializable {
                                 fireBaseItems.remove(0);
                                 myFirebase.child(fireBaseItems.get(0).getId()).child("upForSale").setValue(true);
                                 timer.cancel();
+
                             }
                         }
                     }, 1000, 1000);
@@ -150,10 +188,6 @@ public class Controller implements Initializable {
         });
     }
 
-    private void clearGUI() {
-        bidHistory.clear();
-    }
-
     public void updateDescription(BidItem item) {
         /*Decodes the image string and sets it as new variable for imageview*/
         imageString = item.getImage();
@@ -171,8 +205,7 @@ public class Controller implements Initializable {
         type = item.getType();
 
         itemId = item.getId();
-        Firebase auctionId = new Firebase("https://biddme.firebaseio.com/auction");
-        auctionId.child("id").setValue(itemId);
+
         buyerId = item.getIdBuyer();
 
         startPrice = item.getStartedPrice();
@@ -188,49 +221,6 @@ public class Controller implements Initializable {
         );
 
 
-    }
-
-    public void doInBackground(final String item){
-
-        /*currPrice = itemsMap.get(item).getCurrentPrice();
-
-        //Add all bids to array
-        allBids.add(""+currPrice+"\n");
-        //Reverse order of bids
-        Collections.reverse(allBids);
-
-
-
-        formattedBidArray = allBids.toString()
-                .replace(",", "")  //remove the commas
-                .replace("[", "")  //remove the left bracket
-                .replace("]", "")  //remove the right bracket
-                .trim();           //remove trailing spaces from partially initialized arrays
-
-        //Information to TextBox / TextView
-        //doesn't update with db at the moment, fix
-        bidHistory.setText("" + formattedBidArray + "\n");
-        highestBid.setText(""+currPrice+"");*/
-
-        /*for (int i = seconds; i>=0; i--) {
-            try {
-                sleep(1000);
-                countdown.setText("Time left: " + i + " seconds");
-                myFirebase.child(itemId).child("timer").setValue(i);
-
-                if(i == 0){
-                    myFirebase.child(itemId).child("sold").setValue(true);
-                    myFirebase.child(itemId).child("idBuyer").setValue("Petter");
-
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
-    }
-
-    public static final int setInterval() {
-        return --seconds;
     }
 
 
