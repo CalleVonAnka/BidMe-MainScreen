@@ -3,20 +3,15 @@ package sample;
 import com.firebase.client.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-
-import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 import sun.misc.BASE64Decoder;
-
-import javax.xml.crypto.Data;
-import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.text.Bidi;
 import java.util.*;
 import java.util.List;
 
@@ -115,6 +110,7 @@ public class Controller implements Initializable {
 
                 if (bidItem.getUpForSale() == true && bidItem.isSold() == false) {
                     seconds = 20;
+                    updateDescription(bidItem);
                     final Timer timer = new Timer();
                     timer.scheduleAtFixedRate(new TimerTask() {
                         @Override
@@ -130,6 +126,8 @@ public class Controller implements Initializable {
                         }
                     }, 1000, 1000);
                 }
+
+
             }
 
             @Override
@@ -149,73 +147,41 @@ public class Controller implements Initializable {
         });
     }
 
-    private void ShowResults() {
-
-
-    }
-
     private void clearGUI() {
         bidHistory.clear();
     }
 
-    public void addToAuction(BidItem bidItem) {
-        if (!fireBaseItems.contains(bidItem)) {
-            System.out.println("Add item");
-            fireBaseItems.add(bidItem);
-        } else {
-            System.out.println(fireBaseItems.indexOf(bidItem));
+    public void updateDescription(BidItem item) {
+        /*Decodes the image string and sets it as new variable for imageview*/
+        imageString = item.getImage();
+        BASE64Decoder base64Decoder = new BASE64Decoder();
+        try {
+            ByteArrayInputStream decodedImage = new ByteArrayInputStream(base64Decoder.decodeBuffer(imageString));
+            Image newImage = new Image(decodedImage);
+            itemImage.setImage(newImage);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        updateDescription(fireBaseItems);
-    }
+        //Set information to variable
+        description = item.getDescription();
+        type = item.getType();
 
-    public void updateAuction(BidItem bidItem) {
-        if (fireBaseItems.contains(bidItem)) {
-            System.out.println("Add item on childUpdate");
-            fireBaseItems.add(bidItem);
-            updateDescription(fireBaseItems);
-        } else {
-            System.out.println("Update description");
-            updateDescription(fireBaseItems);
-        }
-    }
+        itemId = item.getId();
+        buyerId = item.getIdBuyer();
 
-    public void updateDescription(List<BidItem> bidList) {
-        for (int i = 0; i < bidList.size(); i++) {
-            if (!bidList.get(i).isSold()) {
-                /*Decodes the image string and sets it as new variable for imageview*/
-                imageString = bidList.get(i).getImage();
-                BASE64Decoder base64Decoder = new BASE64Decoder();
-                try {
-                    ByteArrayInputStream decodedImage = new ByteArrayInputStream(base64Decoder.decodeBuffer(imageString));
-                    Image newImage = new Image(decodedImage);
-                    itemImage.setImage(newImage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                //Set information to variable
-                description = bidList.get(i).getDescription();
-                type = bidList.get(i).getType();
-
-                itemId = bidList.get(i).getId();
-                buyerId = bidList.get(i).getIdBuyer();
-
-                startPrice = bidList.get(i).getStartedPrice();
+        startPrice = item.getStartedPrice();
 
 
         /*Information to TextBox*/
-                itemDescription.setText(
-                        "Type: " + type + "\n" +
-                                "Title: " + titleName + "\n" +
-                                "Description: \n" + description + "\n" +
-                                "Start price: " + startPrice + "\n" +
-                                "Item: " + type + "\n"
-                );
+        itemDescription.setText(
+                "Type: " + type + "\n" +
+                        "Title: " + titleName + "\n" +
+                        "Description: \n" + description + "\n" +
+                        "Start price: " + startPrice + "\n" +
+                        "Item: " + type + "\n"
+        );
 
-                doInBackground(bidList.get(i).getTitle());
-            }
-        }
 
     }
 
