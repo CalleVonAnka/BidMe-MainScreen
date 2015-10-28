@@ -37,6 +37,8 @@ public class Controller implements Initializable {
 
     private Firebase myFirebaseUsers = new Firebase("https://biddme.firebaseio.com/users");
 
+    private Firebase getMyFirebaseBids = new Firebase("http://biddme.firebaseio.com/items");
+
     //Creates a two lists which holds the FirebaseItems and FirebaseUsers
     private List<BidItem> fireBaseItems = new ArrayList<BidItem>();
     private List<BidUsers> fireBaseUsers = new ArrayList<BidUsers>();
@@ -50,6 +52,7 @@ public class Controller implements Initializable {
     private ArrayList<String> allBids = new ArrayList();
 
     private static int seconds;
+    private int TIME = 20;
 
     private String titleName;
     private String buyerId;
@@ -70,22 +73,7 @@ public class Controller implements Initializable {
         System.out.println("Initialize data...");
         hashMapItem = new HashMap<String, Object>();
                 goOnline();
-
-        //Event that listens for changes in the database
-        /*myFirebase.addValueEventListener(new ValueEventListener() {
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-
-                    //kanske l�gga in bidhistory som egen funtion h�r
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("Firebase read failed: " + firebaseError.getMessage());
-            }
-        });*/
+        seconds = TIME;
 
         myFirebaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
@@ -117,11 +105,11 @@ public class Controller implements Initializable {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 final BidItem bidItem = dataSnapshot.getValue(BidItem.class);
+                System.out.println("Child updated");
 
-                if (bidItem.getUpForSale() == true && bidItem.isSold() == false) {
-                    seconds = 80;
+                if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
                     updateDescription(bidItem);
-
+                    System.out.println("Update Timer");
                     final Timer timer = new Timer();
                     timer.scheduleAtFixedRate(new TimerTask() {
                         @Override
@@ -133,6 +121,7 @@ public class Controller implements Initializable {
                                 fireBaseItems.remove(0);
                                 myFirebase.child(fireBaseItems.get(0).getId()).child("upForSale").setValue(true);
                                 timer.cancel();
+                                seconds = TIME;
                                 clearGUI();
                             }
                         }
@@ -141,7 +130,8 @@ public class Controller implements Initializable {
 
                 try {
                     for (int i = 0; i < fireBaseUsers.size(); i++) {
-                        if (bidItem.getBids().get(fireBaseUsers.get(i).getId()) > highestBidder) {
+
+                        if (bidItem.getBids().get(fireBaseUsers.get(i).getId()) != null) {
                             highestBidder = bidItem.getBids().get(fireBaseUsers.get(i).getId());
                             System.out.println("Highest bidder is " + fireBaseUsers.get(i).getUsername() + " with amount of " + highestBidder);
                             bidHistory.setText("Highest bidder is " + fireBaseUsers.get(i).getUsername() + " with amount of " + highestBidder);
