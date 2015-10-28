@@ -11,7 +11,6 @@ import sun.misc.BASE64Decoder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.text.Bidi;
 import java.util.*;
 import java.util.List;
 
@@ -28,17 +27,27 @@ public class Controller implements Initializable {
 //    @FXML public Button button1;
 
 
-    //Creates a connection to firebase
+    //Creates a connection to Firebase Items
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
 
-    //Creates a list which holds the firebaseitems and a hashmap
+    private Firebase myFirebaseUsers = new Firebase("https://biddme.firebaseio.com/users");
+
+    private Firebase getMyFirebaseBids = new Firebase("http://biddme.firebaseio.com/items");
+
+    //Creates a two lists which holds the FirebaseItems and FirebaseUsers
     private List<BidItem> fireBaseItems = new ArrayList<BidItem>();
+    private List<BidUsers> fireBaseUsers = new ArrayList<BidUsers>();
+
+    private int highestBidder = 0;
+
+
     private HashMap<String, BidItem> itemsMap = new HashMap<String, BidItem>();
 
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
 
     private static int seconds;
+    private int TIME = 20;
 
     private String titleName;
     private String buyerId;
@@ -59,20 +68,21 @@ public class Controller implements Initializable {
         System.out.println("Initialize data...");
         hashMapItem = new HashMap<String, Object>();
                 goOnline();
+        seconds = TIME;
 
-        //Event that listens for changes in the database
-        myFirebase.addValueEventListener(new ValueEventListener() {
+        myFirebaseUsers.addValueEventListener(new ValueEventListener() {
+            @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
+                System.out.println("There are " + dataSnapshot.getChildrenCount() + " users");
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-
-                    //kanske l�gga in bidhistory som egen funtion h�r
+                    BidUsers bidUsers = postSnapshot.getValue(BidUsers.class);
+                    fireBaseUsers.add(bidUsers);
                 }
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("Firebase read failed: " + firebaseError.getMessage());
+
             }
         });
 
@@ -84,8 +94,8 @@ public class Controller implements Initializable {
                 /*Selects only a value which will be used
                     H�mtar title och l�gger i itemsMap*/
                 BidItem bidItem = snapshot.getValue(BidItem.class);
-                itemsMap.put(bidItem.getTitle(), bidItem);
                 fireBaseItems.add(bidItem);
+<<<<<<< HEAD
 
 
 
@@ -103,15 +113,18 @@ public class Controller implements Initializable {
 
                 clearGUI();*/
 
+=======
+>>>>>>> master
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 final BidItem bidItem = dataSnapshot.getValue(BidItem.class);
+                System.out.println("Child updated");
 
-                if (bidItem.getUpForSale() == true && bidItem.isSold() == false) {
-                    seconds = 20;
+                if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
                     updateDescription(bidItem);
+                    System.out.println("Update Timer");
                     final Timer timer = new Timer();
                     timer.scheduleAtFixedRate(new TimerTask() {
                         @Override
@@ -125,12 +138,25 @@ public class Controller implements Initializable {
                                 fireBaseItems.remove(0);
                                 myFirebase.child(fireBaseItems.get(0).getId()).child("upForSale").setValue(true);
                                 timer.cancel();
+                                seconds = TIME;
+                                clearGUI();
                             }
                         }
                     }, 1000, 1000);
                 }
 
+                try {
+                    for (int i = 0; i < fireBaseUsers.size(); i++) {
 
+                        if (bidItem.getBids().get(fireBaseUsers.get(i).getId()) != null) {
+                            highestBidder = bidItem.getBids().get(fireBaseUsers.get(i).getId());
+                            System.out.println("Highest bidder is " + fireBaseUsers.get(i).getUsername() + " with amount of " + highestBidder);
+                            bidHistory.setText("Highest bidder is " + fireBaseUsers.get(i).getUsername() + " with amount of " + highestBidder);
+                        }
+                    }
+                } catch (NullPointerException e) {
+                    System.out.println("Nullpointer");
+                }
             }
 
             @Override
@@ -189,50 +215,6 @@ public class Controller implements Initializable {
 
 
     }
-
-    public void doInBackground(final String item){
-
-        /*currPrice = itemsMap.get(item).getCurrentPrice();
-
-        //Add all bids to array
-        allBids.add(""+currPrice+"\n");
-        //Reverse order of bids
-        Collections.reverse(allBids);
-
-
-
-        formattedBidArray = allBids.toString()
-                .replace(",", "")  //remove the commas
-                .replace("[", "")  //remove the left bracket
-                .replace("]", "")  //remove the right bracket
-                .trim();           //remove trailing spaces from partially initialized arrays
-
-        //Information to TextBox / TextView
-        //doesn't update with db at the moment, fix
-        bidHistory.setText("" + formattedBidArray + "\n");
-        highestBid.setText(""+currPrice+"");*/
-
-        /*for (int i = seconds; i>=0; i--) {
-            try {
-                sleep(1000);
-                countdown.setText("Time left: " + i + " seconds");
-                myFirebase.child(itemId).child("timer").setValue(i);
-
-                if(i == 0){
-                    myFirebase.child(itemId).child("sold").setValue(true);
-                    myFirebase.child(itemId).child("idBuyer").setValue("Petter");
-
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
-    }
-
-    public static final int setInterval() {
-        return --seconds;
-    }
-
 
     public void goOnline() {
         myFirebase.goOnline();
