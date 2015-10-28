@@ -1,21 +1,16 @@
 package sample;
 
 import com.firebase.client.*;
-import com.firebase.client.core.Platform;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Duration;
 import sun.misc.BASE64Decoder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.text.Bidi;
 import java.util.*;
 import java.util.List;
 
