@@ -87,11 +87,13 @@
                </image>
             </ImageView>
             <Label text="Item description:" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+             <Label fx:id="pincode" text="Pincode: 1234" layoutX="109.0" layoutY="10.0" style="-fx-font-weight: bold; -fx-font-size: 20;" />
             <Label text="Bidding history:" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" />
             <Label alignment="CENTER" text="Highest bid:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP" />
             <Pane prefHeight="200.0" prefWidth="200.0" />
             <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
                <children>
+
                   <Button fx:id="button" defaultButton="true" layoutX="109.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonClicked" text="Start" />
                </children></Pane>
             <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" />

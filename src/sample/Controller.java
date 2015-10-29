@@ -4,12 +4,15 @@ import com.firebase.client.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import sun.misc.BASE64Decoder;
+
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +30,7 @@ public class Controller implements Initializable {
     @FXML public TextField highestBid;
     @FXML public ImageView itemImage;
     @FXML public Button button;
+    @FXML public javafx.scene.control.Label pincode;
     //BidItem bidItem;
     Image newImage;
 //    @FXML public Button button1;
@@ -34,6 +38,7 @@ public class Controller implements Initializable {
 
     //Creates a connection to Firebase Items
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
+    private Firebase firebaseRef = new Firebase("https://biddme.firebaseio.com/");
 
     private Firebase myFirebaseUsers = new Firebase("https://biddme.firebaseio.com/users");
 
@@ -77,12 +82,16 @@ public class Controller implements Initializable {
         System.out.println("Initialize data...");
         hashMapItem = new HashMap<String, Object>();
 
+        int pin = (int)(Math.random() * 9999)+1000;
+        firebaseRef.child("pincode").setValue(pin);
+        pincode.setText("PINCODE: " + pin);
 
         seconds = TIME;
 
         myFirebaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 System.out.println("There are " + dataSnapshot.getChildrenCount() + " users");
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     BidUsers bidUsers = postSnapshot.getValue(BidUsers.class);
