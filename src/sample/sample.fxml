@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
@@ -78,7 +79,7 @@
           <RowConstraints maxHeight="76.0" minHeight="10.0" prefHeight="76.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextField fx:id="highestBid" editable="false" alignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 16;" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <TextField fx:id="highestBid" alignment="CENTER" editable="false" style="-fx-font-weight: bold; -fx-font-size: 16;" GridPane.columnIndex="1" GridPane.rowIndex="2">
             </TextField>
             <ImageView fx:id="itemImage" fitHeight="358.0" fitWidth="268.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                <image>
@@ -89,7 +90,10 @@
             <Label text="Bidding history:" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" />
             <Label alignment="CENTER" text="Highest bid:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP" />
             <Pane prefHeight="200.0" prefWidth="200.0" />
-            <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" />
+            <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+               <children>
+                  <Button fx:id="button" defaultButton="true" layoutX="109.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonClicked" text="Start" />
+               </children></Pane>
             <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" />
             <TextArea fx:id="itemDescription" editable="false" prefHeight="200.0" prefWidth="200.0" style="-fx-font-size: 24;" GridPane.rowIndex="1">
                <GridPane.margin>

@@ -1,19 +1,15 @@
 package sample;
 
 import com.firebase.client.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 import sun.misc.BASE64Decoder;
-
-import javax.xml.crypto.Data;
-import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -30,18 +26,29 @@ public class Controller implements Initializable {
     @FXML public TextArea bidHistory;
     @FXML public TextField highestBid;
     @FXML public ImageView itemImage;
+    @FXML public Button button;
 //    @FXML public Button button1;
 
 
-    //Creates a connection to firebase
+    //Creates a connection to Firebase Items
     private Firebase myFirebase = new Firebase("https://biddme.firebaseio.com/items");
 
-    //Creates a list which holds the firebaseitems and a hashmap
-    private List<HashMap<String,Object>> fireBaseItems = new ArrayList<HashMap<String, Object>>();
+    private Firebase myFirebaseUsers = new Firebase("https://biddme.firebaseio.com/users");
+
+    //Creates a two lists which holds the FirebaseItems and FirebaseUsers
+    private List<BidItem> fireBaseItems = new ArrayList<BidItem>();
+    private List<BidUsers> fireBaseUsers = new ArrayList<BidUsers>();
+
+    private int highestBidder = 0;
+
+
     private HashMap<String, BidItem> itemsMap = new HashMap<String, BidItem>();
 
     //Array to store all bids
     private ArrayList<String> allBids = new ArrayList();
+
+    private static int seconds;
+    private int TIME = 60;
 
     private String titleName;
     private String buyerId;
@@ -54,25 +61,29 @@ public class Controller implements Initializable {
     private Integer currPrice;
     private Integer startPrice;
 
+    private HashMap<String, Object> hashMapItem;
+
     //Initialize the program
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Initialize data...");
+        hashMapItem = new HashMap<String, Object>();
         goOnline();
+        seconds = TIME;
 
-        //Event that listens for changes in the database
-        myFirebase.addValueEventListener(new ValueEventListener() {
+        myFirebaseUsers.addValueEventListener(new ValueEventListener() {
+            @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //System.out.println("There are " + dataSnapshot.getChildrenCount() + " bidding posts");
+                System.out.println("There are " + dataSnapshot.getChildrenCount() + " users");
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-
-                    //kanske lägga in bidhistory som egen funtion här
+                    BidUsers bidUsers = postSnapshot.getValue(BidUsers.class);
+                    fireBaseUsers.add(bidUsers);
                 }
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("Firebase read failed: " + firebaseError.getMessage());
+
             }
         });
 
@@ -80,30 +91,63 @@ public class Controller implements Initializable {
             // Retrieve new posts as they are added to the database
             @Override
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
-
                 /*Selects only a value which will be used
                     Hämtar title och lägger i itemsMap*/
                 BidItem bidItem = snapshot.getValue(BidItem.class);
-                itemsMap.put(bidItem.getTitle(), bidItem);
 
-
-                titleName = bidItem.getTitle().toString();
-                System.out.println(titleName);
-                isSold = itemsMap.get(titleName).isSold();
-                if (!isSold) {
-                    updateDescription(titleName);//sträng med namnet på title i firebase för att starta metoden och
-                    doInBackground(titleName);//det som ska köras vid sidan om
-                }else{
-                    ShowResults();
-                }
-
-                clearGUI();
-
+                fireBaseItems.add(bidItem);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                final BidItem bidItem = dataSnapshot.getValue(BidItem.class);
+                System.out.println("Child updated");
+                updateDescription(bidItem);
+                if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
 
+                    System.out.println("Update Timer");
+                    final Timer timer = new Timer();
+                    timer.scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+                            countdown.setText("Time left: " + --seconds);
+                            if (seconds == 0) {
+                                myFirebase.child(bidItem.getId()).child("sold").setValue(true);
+                                myFirebase.child(bidItem.getId()).child("upForSale").setValue(false);
+                                fireBaseItems.remove(0);
+                                myFirebase.child(fireBaseItems.get(0).getId()).child("upForSale").setValue(true);
+                                timer.cancel();
+                                seconds = TIME;
+                                clearGUI();
+                            }
+                        }
+                    }, 1000, 1000);
+                }
+
+                try {
+                    for (int i = 0; i < fireBaseUsers.size(); i++) {
+
+                        if (bidItem.getBids().get(fireBaseUsers.get(i).getId()) != null) {
+                            highestBidder = bidItem.getBids().get(fireBaseUsers.get(i).getId());
+                            String newBid = String.valueOf(highestBidder);
+                            allBids.add(""+ newBid + "\n");
+                            System.out.println("Highest bidder is " + fireBaseUsers.get(i).getUsername() + " with amount of " + highestBidder);
+                            highestBid.setText(fireBaseUsers.get(i).getUsername() + " with " + highestBidder + " KR!");
+
+                            Collections.reverse(allBids);
+                            formattedBidArray = allBids.toString()
+                                                    .replace(",", "")  //remove the commas
+                                                    .replace("[", "")  //remove the left bracket
+                                                    .replace("]", "")  //remove the right bracket
+                                                    .trim();           //remove trailing spaces from partially initialized arrays
+                            bidHistory.setText(" " + formattedBidArray + "\n");
+                            bidHistory.autosize();
+                            bidHistory.setWrapText(true);
+                        }
+                    }
+                } catch (NullPointerException e) {
+                    System.out.println("Nullpointer");
+                }
             }
 
             @Override
@@ -123,20 +167,16 @@ public class Controller implements Initializable {
         });
     }
 
-    private void ShowResults() {
-
-
-    }
-
     private void clearGUI() {
+        System.out.println("GUI cleared!");
         bidHistory.clear();
     }
 
-
-    public void updateDescription(String item) {
-
+    public void updateDescription(BidItem item) {
+        System.out.println("Updated Description!");
+        button.setDisable(true);
         /*Decodes the image string and sets it as new variable for imageview*/
-        imageString = itemsMap.get(item).getImage();
+        imageString = item.getImage();
         BASE64Decoder base64Decoder = new BASE64Decoder();
         try {
             ByteArrayInputStream decodedImage = new ByteArrayInputStream(base64Decoder.decodeBuffer(imageString));
@@ -147,13 +187,13 @@ public class Controller implements Initializable {
         }
 
         //Set information to variable
-        description = itemsMap.get(item).getDescription();
-        type = itemsMap.get(item).getType();
+        description = item.getDescription();
+        type = item.getType();
 
-        itemId = itemsMap.get(item).getId();
-        buyerId = itemsMap.get(item).getIdBuyer();
+        itemId = item.getId();
+        buyerId = item.getIdBuyer();
 
-        startPrice = itemsMap.get(item).getStartedPrice();
+        startPrice = item.getStartedPrice();
 
 
         /*Information to TextBox*/
@@ -165,49 +205,13 @@ public class Controller implements Initializable {
                         "Item: " + type + "\n"
         );
 
+        //tömmer bidhistory array
+        allBids.clear();
+//        allBids.removeAll(allBids);
+//        Arrays.fill(allBids, null);
+//        allBids.removeAll(Arrays.asList("", null));
+
     }
-
-    public void doInBackground(String item){
-
-        currPrice = itemsMap.get(item).getCurrentPrice();
-
-        //Add all bids to array
-        allBids.add(""+currPrice+"\n");
-        //Reverse order of bids
-        Collections.reverse(allBids);
-
-
-
-        formattedBidArray = allBids.toString()
-                .replace(",", "")  //remove the commas
-                .replace("[", "")  //remove the left bracket
-                .replace("]", "")  //remove the right bracket
-                .trim();           //remove trailing spaces from partially initialized arrays
-
-        //Information to TextBox / TextView
-        //doesn't update with db at the moment, fix
-        bidHistory.setText("" + formattedBidArray + "\n");
-        highestBid.setText(""+currPrice+"");
-
-        int seconds = 20;
-
-        for (int i = seconds; i>=0; i--) {
-            try {
-                sleep(1000);
-                countdown.setText("Time left: " + i + " seconds");
-                myFirebase.child(itemId).child("timer").setValue(i);
-
-                if(i == 0){
-                    myFirebase.child(itemId).child("sold").setValue(true);
-                    myFirebase.child(itemId).child("idBuyer").setValue("Petter");
-
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     public void goOnline() {
         myFirebase.goOnline();
@@ -215,5 +219,11 @@ public class Controller implements Initializable {
 
     public void onStop(){
         myFirebase.goOffline();
+    }
+
+    public void buttonClicked(ActionEvent event) {
+        System.out.println("Button was clicked, auction started!");
+        BidItem bidItem = fireBaseItems.get(0);
+        myFirebase.child(bidItem.getId()).child("upForSale").setValue(true);
     }
 }

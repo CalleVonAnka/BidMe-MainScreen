@@ -12,7 +12,7 @@ public class BidItem {
 
     //Retrieves items from database, for easier use in controller
 
-//    private Map<String, Object> bids;
+    //    private Map<String, Object> bids;
     private int currentPrice;
     private String description;
     private String id;
@@ -20,17 +20,15 @@ public class BidItem {
     private String idSeller;
     private String image;
     private boolean sold;
+    private boolean upForSale;
     private int startedPrice;
     private int timer;
     private String title;
     private String type;
+    private HashMap<String, Integer> bids;
 
     public BidItem() {
     }
-
-    /*public Map<String, Object> getBids() {
-        return bids;
-    }*/
 
     public int getCurrentPrice() {
         return currentPrice;
@@ -60,6 +58,8 @@ public class BidItem {
         return sold;
     }
 
+    public boolean getUpForSale() { return upForSale; }
+
     public int getStartedPrice() {
         return startedPrice;
     }
@@ -75,5 +75,7 @@ public class BidItem {
     public String getType() {
         return type;
     }
+
+    public HashMap<String, Integer> getBids() { return bids; }
 
 }
