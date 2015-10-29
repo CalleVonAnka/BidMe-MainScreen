@@ -27,7 +27,7 @@ public class Controller implements Initializable {
     @FXML public TextField highestBid;
     @FXML public ImageView itemImage;
     @FXML public Button button;
-    BidItem bidItem;
+    //BidItem bidItem;
     Image newImage;
 //    @FXML public Button button1;
 
@@ -40,11 +40,13 @@ public class Controller implements Initializable {
     //Creates a two lists which holds the FirebaseItems and FirebaseUsers
     private List<BidItem> fireBaseItems = new ArrayList<BidItem>();
     private List<BidUsers> fireBaseUsers = new ArrayList<BidUsers>();
+    private  Map<String, Object> deactivate= new HashMap<String, Object>();
+    private  Map<String, Object> activate= new HashMap<String, Object>();
 
 
     private int highestBidder = 0;
     private int latestBid = 0;
-    private int winnerBid=0;
+
 
 
     private HashMap<String, BidItem> itemsMap = new HashMap<String, BidItem>();
@@ -73,7 +75,9 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         goOnline();
         System.out.println("Initialize data...");
-        hashMapItem = new HashMap<>();
+        hashMapItem = new HashMap<String, Object>();
+
+
         seconds = TIME;
 
         myFirebaseUsers.addValueEventListener(new ValueEventListener() {
@@ -98,14 +102,16 @@ public class Controller implements Initializable {
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
                 /*Selects only a value which will be used
                     H�mtar title och l�gger i itemsMap*/
-                bidItem = snapshot.getValue(BidItem.class);
+                BidItem bidItem = snapshot.getValue(BidItem.class);
                 fireBaseItems.add(bidItem);
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
                 final BidItem bidItem = dataSnapshot.getValue(BidItem.class);
+                fireBaseItems.add(bidItem);
                 System.out.println("Child updated");
                 updateDescription(bidItem);
                 if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
@@ -118,22 +124,17 @@ public class Controller implements Initializable {
                             countdown.setText("Time left: " + --seconds);
                             if (seconds == 0) {
                                 System.out.println("Entered seconds ==0 if sats");
-                                myFirebase.child(bidItem.getId()).child("sold").setValue(true);
-                                myFirebase.child(bidItem.getId()).child("upForSale").setValue(false);
-                                fireBaseItems.remove(0);
-
                                 timer.cancel();
-
                                 seconds = TIME;
                                 clearGUI();
-                                myFirebase.child(fireBaseItems.get(0).getId()).child("sold").setValue(false);
-                                myFirebase.child(fireBaseItems.get(0).getId()).child("upForSale").setValue(true);
-
+                                fireBaseItems.remove(0);
+                                pastItem();
 
                             }
                         }
                     }, 1000, 1000);
                 }
+
                 try {
                     for (int i = 0; i < fireBaseUsers.size(); i++) {
 
@@ -235,6 +236,23 @@ public class Controller implements Initializable {
 //        allBids.removeAll(Arrays.asList("", null));
 
     }
+    public void nextItem() {
+        BidItem bidItem = fireBaseItems.get(0);
+        //final Map<String, Object> activate= new HashMap<String, Object>();
+        activate.put("upForSale", true);
+        activate.put("sold", false);
+        myFirebase.child(bidItem.getId()).updateChildren(activate);
+    }
+
+    public void pastItem() {
+        BidItem bidItem = fireBaseItems.get(0);
+
+        //final Map<String, Object> deactivate= new HashMap<String, Object>();
+        deactivate.put("upForSale", false);
+        deactivate.put("sold", true);
+        myFirebase.child(bidItem.getId()).updateChildren(deactivate);
+        nextItem();
+    }
 
     public void goOnline() {
         myFirebase.goOnline();
@@ -245,9 +263,10 @@ public class Controller implements Initializable {
     }
 
     public void buttonClicked(ActionEvent event) {
+
         System.out.println("Button was clicked, auction started!");
-        BidItem bidItem = fireBaseItems.get(0);
-        myFirebase.child(bidItem.getId()).child("upForSale").setValue(true);
+        pastItem();
 
     }
+
 }
