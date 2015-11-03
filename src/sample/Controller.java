@@ -127,8 +127,9 @@ public class Controller implements Initializable {
                                 timer.cancel();
                                 seconds = TIME;
                                 clearGUI();
-                                fireBaseItems.remove(0);
                                 pastItem();
+                                fireBaseItems.remove(0);
+                                nextItem();
 
                             }
                         }
@@ -240,7 +241,7 @@ public class Controller implements Initializable {
         BidItem bidItem = fireBaseItems.get(0);
         //final Map<String, Object> activate= new HashMap<String, Object>();
         activate.put("upForSale", true);
-        activate.put("sold", false);
+        //activate.put("sold", false);
         myFirebase.child(bidItem.getId()).updateChildren(activate);
     }
 
@@ -251,7 +252,6 @@ public class Controller implements Initializable {
         deactivate.put("upForSale", false);
         deactivate.put("sold", true);
         myFirebase.child(bidItem.getId()).updateChildren(deactivate);
-        nextItem();
     }
 
     public void goOnline() {
@@ -265,7 +265,7 @@ public class Controller implements Initializable {
     public void buttonClicked(ActionEvent event) {
 
         System.out.println("Button was clicked, auction started!");
-        pastItem();
+        nextItem();
 
     }
 
