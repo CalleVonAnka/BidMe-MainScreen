@@ -249,6 +249,11 @@ public class Controller implements Initializable {
     }
     public void nextItem() {
         BidItem bidItem = fireBaseItems.get(0);
+       /* for (int i = 0; i < fireBaseUsers.size(); i++) {
+            if (bidItem.getBids().get(fireBaseUsers.get(i).getId()) != null) {
+                latestBid = bidItem.getBids().get(fireBaseUsers.get(i).getId());
+            }
+        }*/
         seconds = TIME;
         //final Map<String, Object> activate= new HashMap<String, Object>();
         activate.put("upForSale", true);
