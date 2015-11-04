@@ -135,7 +135,6 @@ public class Controller implements Initializable {
                             if (seconds == 0) {
                                 System.out.println("Entered seconds ==0 if sats");
                                 timer.cancel();
-                                //seconds = TIME;
                                 pastItem();
                                 clearGUI();
                                 idBuyer = idHighestBidder;
