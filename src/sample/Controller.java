@@ -122,9 +122,9 @@ public class Controller implements Initializable {
                 final BidItem bidItem = dataSnapshot.getValue(BidItem.class);
                 fireBaseItems.add(bidItem);
                 System.out.println("Child updated");
-                updateDescription(bidItem);
-                if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
 
+                if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
+                    updateDescription(bidItem);
                     System.out.println("Update Timer");
                     final Timer timer = new Timer();
                     timer.scheduleAtFixedRate(new TimerTask() {
@@ -134,10 +134,12 @@ public class Controller implements Initializable {
                             if (seconds == 0) {
                                 System.out.println("Entered seconds ==0 if sats");
                                 timer.cancel();
-                                seconds = TIME;
-                                clearGUI();
-                                fireBaseItems.remove(0);
+                                //seconds = TIME;
                                 pastItem();
+                                clearGUI();
+
+                                fireBaseItems.remove(0);
+
 
                             }
                         }
@@ -207,7 +209,7 @@ public class Controller implements Initializable {
 
     public void updateDescription(BidItem item) {
         System.out.println("Updated Description!");
-        button.setDisable(true);
+        //button.setDisable(true);
         /*Decodes the image string and sets it as new variable for imageview*/
         imageString = item.getImage();
         BASE64Decoder base64Decoder = new BASE64Decoder();
@@ -247,9 +249,12 @@ public class Controller implements Initializable {
     }
     public void nextItem() {
         BidItem bidItem = fireBaseItems.get(0);
+        seconds = TIME;
         //final Map<String, Object> activate= new HashMap<String, Object>();
         activate.put("upForSale", true);
         activate.put("sold", false);
+        latestBid=0;
+        highestBidder=0;
         myFirebase.child(bidItem.getId()).updateChildren(activate);
     }
 
@@ -260,7 +265,7 @@ public class Controller implements Initializable {
         deactivate.put("upForSale", false);
         deactivate.put("sold", true);
         myFirebase.child(bidItem.getId()).updateChildren(deactivate);
-        nextItem();
+
     }
 
     public void goOnline() {
@@ -274,7 +279,7 @@ public class Controller implements Initializable {
     public void buttonClicked(ActionEvent event) {
 
         System.out.println("Button was clicked, auction started!");
-        pastItem();
+        nextItem();
 
     }
 
