@@ -55,7 +55,7 @@ public class Controller implements Initializable {
     private ArrayList<String> allBids = new ArrayList();
 
     private static int seconds;
-    private int TIME = 30;
+    private int TIME = 50;
 
     private String titleName;
     private String buyerId;
@@ -104,7 +104,7 @@ public class Controller implements Initializable {
                     H�mtar title och l�gger i itemsMap*/
                 BidItem bidItem = snapshot.getValue(BidItem.class);
                 fireBaseItems.add(bidItem);
-
+                System.out.println("An item has been added!");
             }
 
             @Override
@@ -113,9 +113,9 @@ public class Controller implements Initializable {
                 final BidItem bidItem = dataSnapshot.getValue(BidItem.class);
                 fireBaseItems.add(bidItem);
                 System.out.println("Child updated");
-                updateDescription(bidItem);
                 if (bidItem.getUpForSale() && !bidItem.isSold() && seconds == TIME) {
 
+                    updateDescription(bidItem);
                     System.out.println("Update Timer");
                     final Timer timer = new Timer();
                     timer.scheduleAtFixedRate(new TimerTask() {
@@ -125,12 +125,17 @@ public class Controller implements Initializable {
                             if (seconds == 0) {
                                 System.out.println("Entered seconds ==0 if sats");
                                 timer.cancel();
-                                seconds = TIME;
+                                //seconds = TIME;
                                 clearGUI();
                                 pastItem();
                                 fireBaseItems.remove(0);
-                                nextItem();
-
+                                /*try {
+                                    Thread.sleep(10000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }*/
+                                //nextItem();
+                                //button.setDisable(false);
                             }
                         }
                     }, 1000, 1000);
@@ -199,7 +204,7 @@ public class Controller implements Initializable {
 
     public void updateDescription(BidItem item) {
         System.out.println("Updated Description!");
-        button.setDisable(true);
+        //button.setDisable(true);
         /*Decodes the image string and sets it as new variable for imageview*/
         imageString = item.getImage();
         BASE64Decoder base64Decoder = new BASE64Decoder();
@@ -241,7 +246,7 @@ public class Controller implements Initializable {
         BidItem bidItem = fireBaseItems.get(0);
         //final Map<String, Object> activate= new HashMap<String, Object>();
         activate.put("upForSale", true);
-        //activate.put("sold", false);
+        activate.put("sold", false);
         myFirebase.child(bidItem.getId()).updateChildren(activate);
     }
 
@@ -251,6 +256,7 @@ public class Controller implements Initializable {
         //final Map<String, Object> deactivate= new HashMap<String, Object>();
         deactivate.put("upForSale", false);
         deactivate.put("sold", true);
+        seconds = TIME;
         myFirebase.child(bidItem.getId()).updateChildren(deactivate);
     }
 
