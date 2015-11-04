@@ -51,7 +51,8 @@ public class Controller implements Initializable {
 
     private int highestBidder = 0;
     private int latestBid = 0;
-
+    private String idHighestBidder;
+    private String idBuyer;
 
 
     private HashMap<String, BidItem> itemsMap = new HashMap<String, BidItem>();
@@ -137,7 +138,9 @@ public class Controller implements Initializable {
                                 //seconds = TIME;
                                 pastItem();
                                 clearGUI();
-
+                                idBuyer = idHighestBidder;
+                                myFirebase.child(bidItem.getId()).child("idBuyer").setValue(idBuyer);
+                                System.out.println(idBuyer + " Won the auction");
                                 fireBaseItems.remove(0);
 
 
@@ -151,12 +154,16 @@ public class Controller implements Initializable {
 
                         if (bidItem.getBids().get(fireBaseUsers.get(i).getId()) != null) {
                             latestBid = bidItem.getBids().get(fireBaseUsers.get(i).getId());
+                            idBuyer = fireBaseUsers.get(i).getId();
+
                             bidHistory.setText("bidds " + fireBaseUsers.get(i).getUsername() + " with amount of " +latestBid);
 
 
                             if (latestBid > highestBidder) {
                                 highestBidder = latestBid;
                                 highestBid.setText(fireBaseUsers.get(i).getUsername() + " with amount of " + highestBidder);
+                                idHighestBidder = fireBaseUsers.get(i).getId();
+                                System.out.println("leading the auction: "+idHighestBidder);
                                 String newBid = String.valueOf(highestBidder);
                                 allBids.add(""+ newBid + "\n");
 
