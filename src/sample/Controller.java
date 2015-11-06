@@ -135,10 +135,10 @@ public class Controller implements Initializable {
                             if (seconds == 0) {
                                 System.out.println("Entered seconds ==0 if sats");
                                 timer.cancel();
-                                pastItem();
-                                clearGUI();
                                 idBuyer = idHighestBidder;
                                 myFirebase.child(bidItem.getId()).child("idBuyer").setValue(idBuyer);
+                                pastItem();
+                                clearGUI();
                                 System.out.println(idBuyer + " Won the auction");
                                 fireBaseItems.remove(0);
 
